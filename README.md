@@ -4,10 +4,10 @@
     [https://youtu.be/DzKO6MzmtMU](https://youtu.be/dFZVYwRPGSw)
    
 
-3.	Scatter Plot:
+2.	Scatter Plot:
 <img width="1600" height="1100" alt="Code_Generated_Image " src="https://github.com/user-attachments/assets/8e7614da-bb9a-4d31-b864-c2227cd47d01" />
 
-4.	### Custom Empirical Formula & Parameter Analysis
+3.	### Custom Empirical Formula & Parameter Analysis
 
 Based on 80 empirical trials collected on the multi-tier radial interface using the Shannon formulation $ID = \log_2(A/W + 1)$, the linear regression model is:
 
