@@ -24,9 +24,11 @@ $$MT = 534.72 + 46.32 \times ID \quad (\text{ms})$$
 
 
 4.	Scenario, Innovation, and Application：
-   傳統方向盤：
+
+  	傳統方向盤：
   	<img width="600" height="600" alt="20241101131812mr9hf1" src="https://github.com/user-attachments/assets/6f4297bf-c158-46a8-aff0-9d5d9a3f39ce" />
 
+   
    Fitts' Law-based design：
    <img width="1600" height="1333" alt="Code_Generated_Image" src="https://github.com/user-attachments/assets/786288a9-a510-49f3-9a40-6f5b4f36a46b" />
 
