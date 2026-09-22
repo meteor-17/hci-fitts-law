@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitts' Law - 車載輪盤式觸控介面實驗</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #111318;
+    color: #f2f2f2;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: min(1100px, 95vw);
+    padding: 25px 0 40px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+    margin: 5px 0 8px;
+    font-weight: 600;
+}
+
+.subtitle {
+    text-align: center;
+    color: #9da3ad;
+    margin-bottom: 22px;
+    font-size: 14px;
+}
+
+.panel {
+    background: #1b1f26;
+    border: 1px solid #303640;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.instructions {
+    line-height: 1.6;
+    color: #d7d9dd;
+    font-size: 14px;
+}
+
+.instructions strong {
+    color: white;
+}
+
+.controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.control-button {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 20px;
+    background: #e7e9ed;
+    color: #111318;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.control-button:hover {
+    background: #ffffff;
+}
+
+.control-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.experiment-info {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.info-box {
+    background: #15181e;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #2b3038;
+}
+
+.info-label {
+    font-size: 11px;
+    color: #858c97;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.canvas-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+canvas {
+    background: #0d0f13;
+    border-radius: 12px;
+    border: 1px solid #363c46;
+    display: block;
+    max-width: 100%;
+}
+
+#status {
+    text-align: center;
+    min-height: 24px;
+    margin-top: 12px;
+    color: #aeb4bd;
+    font-size: 14px;
+}
+
+.result {
+    display: none;
+}
+
+.result h2 {
+    margin-top: 0;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.result-box {
+    background: #15181e;
+    padding: 18px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.result-number {
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+th, td {
+    padding: 9px;
+    border-bottom: 1px solid #30353e;
+    text-align: center;
+}
+
+th {
+    color: #aeb4bd;
+    font-weight: 500;
+}
+
+.formula {
+    background: #101217;
+    border: 1px solid #303640;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    text-align: center;
+    font-family: "Times New Roman", serif;
+    font-size: 20px;
+}
+
+.small-note {
+    color: #858c97;
+    font-size: 12px;
+    margin-top: 12px;
+}
+
+@media (max-width: 700px) {
+    .experiment-info {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>費茨法則實驗：車載輪盤式觸控控制</h1>
+    <div class="subtitle">車載多層次階梯式輪盤介面（Hierarchical Radial HMI）</div>
+
+    <!-- Instructions -->
+    <div class="panel">
+        <div class="instructions">
+            <strong>情境說明</strong><br>
+            想像您正在駕駛並操作車載同心輪盤式（Radial Jog Dial）觸控介面。<br>
+            您的任務是在兼顧準確性的前提下，盡可能快速地點擊高亮顯示的控制區塊。<br><br>
+
+            <strong>介面三層階級架構</strong><br>
+            • <strong>第一層（放大核心大圓）</strong>：左右超大半圓，分別為溫度降低（−）與調升（+）。<br>
+            • <strong>第二層（中圓大扇形）</strong>：4 個主要空調扇區按鈕（DEFROST、AUTO、FAN、A/C）。<br>
+            • <strong>第三層（外圓緊湊小按鈕）</strong>：8 個較小的快捷功能扇區（MUSIC、MAP、PHONE、BROWSER、VOL −、VOL +、MUTE、SETTINGS）。<br><br>
+
+            <strong>實驗任務：</strong>
+            當某個目標以橘色高亮顯示時，請儘速點擊該橘色目標。共進行 80 次測試。
+        </div>
+
+        <div class="controls">
+            <button class="control-button" id="startBtn" onclick="startExperiment()">開始實驗</button>
+            <button class="control-button" id="restartBtn" onclick="restartExperiment()" disabled>重新開始</button>
+            <button class="control-button" id="exportBtn" onclick="exportCSV()" disabled>匯出 CSV</button>
+        </div>
+    </div>
+
+    <!-- Experiment info -->
+    <div class="panel">
+        <div class="experiment-info">
+            <div class="info-box">
+                <div class="info-label">測試進度 (Trial)</div>
+                <div class="info-value" id="trialDisplay">0 / 80</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">目標距離 A (px)</div>
+                <div class="info-value" id="aDisplay">-</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">目標寬度 W (px)</div>
+                <div class="info-value" id="wDisplay">-</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">難度指數 ID</div>
+                <div class="info-value" id="idDisplay">-</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">移動時間 MT (ms)</div>
+                <div class="info-value" id="mtDisplay">-</div>
+            </div>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="experimentCanvas" width="1000" height="600"></canvas>
+        </div>
+
+        <div id="status">點擊「開始實驗」以啟動測試。</div>
+    </div>
+
+    <!-- Results -->
+    <div class="panel result" id="resultPanel">
+        <h2>實驗完成</h2>
+        <p>您已完成所有 80 次測試。您可以點擊上方按鈕匯出 CSV 檔以進行回歸分析。</p>
+
+        <div class="result-grid">
+            <div class="result-box">
+                <div>總測試次數</div>
+                <div class="result-number" id="resultTrials">80</div>
+            </div>
+            <div class="result-box">
+                <div>平均移動時間 (Mean MT)</div>
+                <div class="result-number" id="resultMean">-</div>
+            </div>
+            <div class="result-box">
+                <div>中位數移動時間 (Median MT)</div>
+                <div class="result-number" id="resultMedian">-</div>
+            </div>
+        </div>
+
+        <h3>費茨法則模型 (Fitts' Law Model)</h3>
+        <div class="formula">MT = a + b × ID</div>
+        <div class="small-note">ID = log₂(A / W + 1)，其中 W 為輪盤區塊的徑向寬度。</div>
+    </div>
+
+    <!-- Data table -->
+    <div class="panel result" id="dataPanel">
+        <h2>收集之數據</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Trial</th>
+                    <th>Target</th>
+                    <th>A (px)</th>
+                    <th>W (px)</th>
+                    <th>MT (ms)</th>
+                    <th>ID</th>
+                </tr>
+            </thead>
+            <tbody id="dataTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("experimentCanvas");
+const ctx = canvas.getContext("2d");
+
+const TOTAL_TRIALS = 80;
+
+// 輪盤中心與更新後的半徑（放大第一層半圓）
+const CENTER = { x: 500, y: 310 };
+const R_INNER = 125;  // 放大第一層大圓半徑 (125px)
+const R_MID   = 205;  // 第二層中環半徑 (125 ~ 205px，厚度 80px)
+const R_OUTER = 265;  // 第三層外環半徑 (205 ~ 265px，厚度 60px，按鈕最小)
+
+/* 所有輪盤按鈕定義 */
+const BUTTONS = [
+    // 1. 第一層核心大圓（放大的左右半圓）
+    { id: "tempMinus", label: "−", ring: 1, side: "left",  w: R_INNER },
+    { id: "tempPlus",  label: "+", ring: 1, side: "right", w: R_INNER },
+
+    // 2. 第二層中圓（4 個大扇形，每個 90 度）
+    { id: "defrost", label: "DEFROST", ring: 2, startAngle: -135, endAngle: -45, w: R_MID - R_INNER },
+    { id: "auto",    label: "AUTO",    ring: 2, startAngle: -45,  endAngle: 45,  w: R_MID - R_INNER },
+    { id: "fan",     label: "FAN",     ring: 2, startAngle: 45,   endAngle: 135, w: R_MID - R_INNER },
+    { id: "ac",      label: "A/C",     ring: 2, startAngle: 135,  endAngle: 225, w: R_MID - R_INNER },
+
+    // 3. 第三層外圓（8 個小扇形，每個 45 度，厚度最小）
+    { id: "music",    label: "MUSIC",    ring: 3, startAngle: -90, endAngle: -45, w: R_OUTER - R_MID },
+    { id: "map",      label: "MAP",      ring: 3, startAngle: -45, endAngle: 0,   w: R_OUTER - R_MID },
+    { id: "phone",    label: "PHONE",    ring: 3, startAngle: 0,   endAngle: 45,  w: R_OUTER - R_MID },
+    { id: "browser",  label: "BROWSER",  ring: 3, startAngle: 45,  endAngle: 90,  w: R_OUTER - R_MID },
+    { id: "volDown",  label: "VOL −",    ring: 3, startAngle: 90,  endAngle: 135, w: R_OUTER - R_MID },
+    { id: "volUp",    label: "VOL +",    ring: 3, startAngle: 135, endAngle: 180, w: R_OUTER - R_MID },
+    { id: "mute",     label: "MUTE",     ring: 3, startAngle: 180, endAngle: 225, w: R_OUTER - R_MID },
+    { id: "settings", label: "SETTINGS", ring: 3, startAngle: 225, endAngle: 270, w: R_OUTER - R_MID }
+];
+
+let trials = [];
+let currentTrial = 0;
+let currentTarget = null;
+let currentW = 0;
+let currentA = 0;
+let currentID = 0;
+let previousTarget = null;
+let startTime = null;
+let experimentRunning = false;
+
+function degToRad(deg) {
+    return (deg * Math.PI) / 180;
+}
+
+// 取得各區域幾何中心點，計算移動距離 A
+function getTargetCentroid(id) {
+    const btn = BUTTONS.find(b => b.id === id);
+    if (btn.ring === 1) {
+        const rOffset = (4 * R_INNER) / (3 * Math.PI);
+        return {
+            x: CENTER.x + (btn.side === "left" ? -rOffset : rOffset),
+            y: CENTER.y
+        };
+    } else {
+        const midR = btn.ring === 2 ? (R_INNER + R_MID) / 2 : (R_MID + R_OUTER) / 2;
+        const midAngle = degToRad((btn.startAngle + btn.endAngle) / 2);
+        return {
+            x: CENTER.x + midR * Math.cos(midAngle),
+            y: CENTER.y + midR * Math.sin(midAngle)
+        };
+    }
+}
+
+function generateTrials() {
+    let list = [];
+    for (let i = 0; i < TOTAL_TRIALS; i++) {
+        const target = BUTTONS[Math.floor(Math.random() * BUTTONS.length)];
+        list.push({
+            target: target.id,
+            W: target.w
+        });
+    }
+    return list;
+}
+
+function startExperiment() {
+    trials = generateTrials();
+    currentTrial = 0;
+    previousTarget = null;
+    experimentRunning = true;
+
+    document.getElementById("startBtn").disabled = true;
+    document.getElementById("restartBtn").disabled = false;
+    document.getElementById("exportBtn").disabled = true;
+    document.getElementById("resultPanel").style.display = "none";
+    document.getElementById("dataPanel").style.display = "none";
+
+    nextTrial();
+}
+
+function restartExperiment() {
+    if (!confirm("確定要重新開始實驗嗎？目前已收集的資料將會被清空。")) return;
+
+    trials = [];
+    currentTrial = 0;
+    previousTarget = null;
+    currentTarget = null;
+    experimentRunning = false;
+
+    clearCanvas();
+    drawRoulette(null);
+
+    document.getElementById("trialDisplay").textContent = "0 / 80";
+    document.getElementById("aDisplay").textContent = "-";
+    document.getElementById("wDisplay").textContent = "-";
+    document.getElementById("idDisplay").textContent = "-";
+    document.getElementById("mtDisplay").textContent = "-";
+    document.getElementById("status").textContent = '點擊「開始實驗」以啟動測試。';
+
+    document.getElementById("startBtn").disabled = false;
+    document.getElementById("restartBtn").disabled = true;
+    document.getElementById("exportBtn").disabled = true;
+    document.getElementById("resultPanel").style.display = "none";
+    document.getElementById("dataPanel").style.display = "none";
+}
+
+function nextTrial() {
+    if (currentTrial >= TOTAL_TRIALS) {
+        finishExperiment();
+        return;
+    }
+
+    const condition = trials[currentTrial];
+    currentTarget = condition.target;
+    currentW = condition.W;
+
+    const currPos = getTargetCentroid(currentTarget);
+    if (previousTarget === null) {
+        currentA = Math.hypot(currPos.x - CENTER.x, currPos.y - CENTER.y);
+    } else {
+        const prevPos = getTargetCentroid(previousTarget);
+        currentA = Math.hypot(currPos.x - prevPos.x, currPos.y - prevPos.y);
+    }
+
+    currentID = Math.log2((currentA / currentW) + 1);
+
+    document.getElementById("trialDisplay").textContent = `${currentTrial + 1} / ${TOTAL_TRIALS}`;
+    document.getElementById("aDisplay").textContent = `${currentA.toFixed(1)} px`;
+    document.getElementById("wDisplay").textContent = `${currentW.toFixed(1)} px`;
+    document.getElementById("idDisplay").textContent = currentID.toFixed(3);
+    document.getElementById("mtDisplay").textContent = "-";
+    document.getElementById("status").textContent = "請點擊橘色高亮的輪盤區塊。";
+
+    drawRoulette(currentTarget);
+
+    startTime = performance.now();
+}
+
+// 繪製整個輪盤介面
+function drawRoulette(highlightId) {
+    clearCanvas();
+
+    // 頂部狀態列
+    ctx.fillStyle = "#181c23";
+    ctx.fillRect(0, 0, canvas.width, 56);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "600 20px Arial";
+    ctx.fillText("RADIAL CENTER CONSOLE INTERFACE", 35, 36);
+
+    ctx.fillStyle = "#858c97";
+    ctx.font = "14px Arial";
+    ctx.fillText("Cockpit Jog Dial", canvas.width - 150, 36);
+
+    // 外層環形底板裝飾光圈
+    ctx.beginPath();
+    ctx.arc(CENTER.x, CENTER.y, R_OUTER + 8, 0, Math.PI * 2);
+    ctx.fillStyle = "#14171d";
+    ctx.fill();
+    ctx.strokeStyle = "#252b36";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 1. 繪製第三層外圓小按鈕（8 個扇區，字體 11px）
+    BUTTONS.filter(b => b.ring === 3).forEach(btn => {
+        drawSector(R_MID, R_OUTER, btn.startAngle, btn.endAngle, btn.id === highlightId);
+        drawSectorText(btn.label, (R_MID + R_OUTER) / 2, (btn.startAngle + btn.endAngle) / 2, btn.id === highlightId, "11px");
+    });
+
+    // 2. 繪製第二層中圓按鈕（4 個大扇區，字體 15px）
+    BUTTONS.filter(b => b.ring === 2).forEach(btn => {
+        drawSector(R_INNER, R_MID, btn.startAngle, btn.endAngle, btn.id === highlightId);
+        drawSectorText(btn.label, (R_INNER + R_MID) / 2, (btn.startAngle + btn.endAngle) / 2, btn.id === highlightId, "15px");
+    });
+
+    // 3. 繪製第一層放大的核心大圓（左右半圓）
+    drawHalfCircle("left", highlightId === "tempMinus");
+    drawHalfCircle("right", highlightId === "tempPlus");
+
+    // 核心中央資訊裝飾小徽章（顯示目前溫度設定）
+    ctx.beginPath();
+    ctx.arc(CENTER.x, CENTER.y, 32, 0, Math.PI * 2);
+    ctx.fillStyle = "#101216";
+    ctx.fill();
+    ctx.strokeStyle = "#383f4d";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 16px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("22°C", CENTER.x, CENTER.y);
+    ctx.textAlign = "start";
+    ctx.textBaseline = "alphabetic";
+
+    // 底部操作指引文字
+    ctx.fillStyle = "#697280";
+    ctx.font = "12px Arial";
+    ctx.fillText("RADIAL CONTROLS: Inner (Enlarged Temp ±) | Middle (Climate) | Outer (Compact Shortcuts)", 35, 582);
+}
+
+// 繪製扇形環塊
+function drawSector(innerR, outerR, startDeg, endDeg, isTarget) {
+    const sRad = degToRad(startDeg);
+    const eRad = degToRad(endDeg);
+
+    ctx.beginPath();
+    ctx.arc(CENTER.x, CENTER.y, outerR, sRad, eRad, false);
+    ctx.arc(CENTER.x, CENTER.y, innerR, eRad, sRad, true);
+    ctx.closePath();
+
+    ctx.fillStyle = isTarget ? "#f28c28" : "#20252e";
+    ctx.fill();
+
+    ctx.strokeStyle = isTarget ? "#ffb15c" : "#343b47";
+    ctx.lineWidth = isTarget ? 3 : 1.5;
+    ctx.stroke();
+}
+
+// 繪製扇形上的文字
+function drawSectorText(label, radius, midDeg, isTarget, fontSize) {
+    const rad = degToRad(midDeg);
+    const x = CENTER.x + radius * Math.cos(rad);
+    const y = CENTER.y + radius * Math.sin(rad);
+
+    ctx.save();
+    ctx.fillStyle = isTarget ? "#111318" : "#d7dadf";
+    ctx.font = `bold ${fontSize} Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, x, y);
+    ctx.restore();
+}
+
+// 繪製第一層放大半圓形按鈕
+function drawHalfCircle(side, isTarget) {
+    const isLeft = side === "left";
+    const startAngle = isLeft ? Math.PI * 0.5 : Math.PI * 1.5;
+    const endAngle   = isLeft ? Math.PI * 1.5 : Math.PI * 0.5;
+
+    ctx.beginPath();
+    ctx.arc(CENTER.x, CENTER.y, R_INNER, startAngle, endAngle, false);
+    ctx.closePath();
+
+    ctx.fillStyle = isTarget ? "#f28c28" : "#262c36";
+    ctx.fill();
+
+    ctx.strokeStyle = isTarget ? "#ffb15c" : "#3d4554";
+    ctx.lineWidth = isTarget ? 3 : 1.5;
+    ctx.stroke();
+
+    // 繪製放大的 + / - 符號
+    const offset = R_INNER * 0.52;
+    const textX = CENTER.x + (isLeft ? -offset : offset);
+
+    ctx.save();
+    ctx.fillStyle = isTarget ? "#111318" : "#ffffff";
+    ctx.font = "bold 44px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(isLeft ? "−" : "+", textX, CENTER.y);
+    ctx.restore();
+}
+
+// 檢查點擊是否命中目標輪盤區塊
+function isHitTarget(mx, my, targetId) {
+    const dx = mx - CENTER.x;
+    const dy = my - CENTER.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < 32) return false; // 中央小徽章防誤觸
+
+    const btn = BUTTONS.find(b => b.id === targetId);
+
+    // 1. 第一層放大的半圓
+    if (btn.ring === 1) {
+        if (dist > R_INNER) return false;
+        return btn.side === "left" ? dx < 0 : dx >= 0;
+    }
+
+    let deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+    // 2. 第二層中圓
+    if (btn.ring === 2) {
+        if (dist <= R_INNER || dist > R_MID) return false;
+        return isAngleInRange(deg, btn.startAngle, btn.endAngle);
+    }
+
+    // 3. 第三層外圓
+    if (btn.ring === 3) {
+        if (dist <= R_MID || dist > R_OUTER) return false;
+        return isAngleInRange(deg, btn.startAngle, btn.endAngle);
+    }
+
+    return false;
+}
+
+function isAngleInRange(angle, start, end) {
+    let a = (angle % 360 + 360) % 360;
+    let s = (start % 360 + 360) % 360;
+    let e = (end % 360 + 360) % 360;
+    return s < e ? (a >= s && a < e) : (a >= s || a < e);
+}
+
+canvas.addEventListener("click", function(event) {
+    if (!experimentRunning || !currentTarget) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const mouseX = (event.clientX - rect.left) * scaleX;
+    const mouseY = (event.clientY - rect.top) * scaleY;
+
+    if (!isHitTarget(mouseX, mouseY, currentTarget)) {
+        return;
+    }
+
+    const endTime = performance.now();
+    const movementTime = endTime - startTime;
+
+    trials[currentTrial].A = currentA;
+    trials[currentTrial].W = currentW;
+    trials[currentTrial].MT = movementTime;
+    trials[currentTrial].ID = currentID;
+    trials[currentTrial].Target = currentTarget;
+
+    document.getElementById("mtDisplay").textContent = `${movementTime.toFixed(1)} ms`;
+    document.getElementById("status").textContent = "點擊成功！";
+
+    previousTarget = currentTarget;
+    currentTrial++;
+
+    setTimeout(nextTrial, 180);
+});
+
+function finishExperiment() {
+    experimentRunning = false;
+    clearCanvas();
+    drawRoulette(null);
+
+    document.getElementById("status").textContent = "實驗已完成。";
+    document.getElementById("exportBtn").disabled = false;
+    document.getElementById("resultPanel").style.display = "block";
+    document.getElementById("dataPanel").style.display = "block";
+
+    calculateSummary();
+    displayDataTable();
+}
+
+function calculateSummary() {
+    const movementTimes = trials.filter(t => t.MT !== undefined).map(t => t.MT);
+    const mean = movementTimes.reduce((s, v) => s + v, 0) / movementTimes.length;
+
+    const sorted = [...movementTimes].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    const median = sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+
+    document.getElementById("resultTrials").textContent = movementTimes.length;
+    document.getElementById("resultMean").textContent = `${mean.toFixed(1)} ms`;
+    document.getElementById("resultMedian").textContent = `${median.toFixed(1)} ms`;
+}
+
+function displayDataTable() {
+    const tbody = document.getElementById("dataTable");
+    tbody.innerHTML = "";
+
+    trials.forEach((trial, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${getTargetLabel(trial.Target)}</td>
+            <td>${trial.A.toFixed(1)}</td>
+            <td>${trial.W.toFixed(1)}</td>
+            <td>${trial.MT.toFixed(1)}</td>
+            <td>${trial.ID.toFixed(3)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function getTargetLabel(id) {
+    const btn = BUTTONS.find(b => b.id === id);
+    return btn ? btn.label : id;
+}
+
+function exportCSV() {
+    if (trials.length === 0) return;
+
+    let csv = "Trial,Target,A,W,MT,ID\r\n";
+    trials.forEach((trial, index) => {
+        csv += `${index + 1},"${getTargetLabel(trial.Target)}",${trial.A.toFixed(3)},${trial.W.toFixed(3)},${trial.MT.toFixed(3)},${trial.ID.toFixed(6)}\r\n`;
+    });
+
+    const blob = new Blob(
+        ["\uFEFF" + csv],
+        { type: "text/csv;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "fitts_law_experiment_data.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// 初始繪製輪盤介面
+drawRoulette(null);
+</script>
+
+</body>
+</html>
