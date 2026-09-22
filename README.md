@@ -30,7 +30,7 @@ $$MT = 534.72 + 46.32 \times ID \quad (\text{ms})$$
 
    
    Fitts' Law-based design：
-   <img width="1600" height="1333" alt="Code_Generated_Image" src="https://github.com/user-attachments/assets/786288a9-a510-49f3-9a40-6f5b4f36a46b" />
+   <img width="1600" height="1600" alt="Code_Generated_Image (1)" src="https://github.com/user-attachments/assets/6a9b7160-75a7-4be2-a2e0-e5e1b5fe4122" />
 
     · Scenario
         駕駛在行駛中，主要視覺注意力必須維持在車前方路面，然而，現代車輛的功能日益繁多，駕駛常需於行車過程中執行次要任務（如切換曲目、     調整音量、變更空調溫度、接聽通話等）。傳統方向盤的控制鍵通常零散分佈在盤面左右兩大區塊，按鍵排列多為平面陣列式或分散橫跨於多個幅條      上。這導致駕駛在盲操時難以快速建立空間參考座標，常因無法精確辨認按鈕位置而被迫將視線移開路面進行二次確認，大幅增加事故風險。
