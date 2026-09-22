@@ -1,7 +1,7 @@
 # hci-fitts-law
 
 1.	Experiment Video Link：
-    https://youtu.be/DzKO6MzmtMU
+    [https://youtu.be/DzKO6MzmtMU](https://youtu.be/dFZVYwRPGSw)
    
 
 3.	Scatter Plot:
